@@ -1,4 +1,5 @@
 ﻿.venv
+.pipenv
 .vscode/.ropeproject
 __pycache__
 VimbaPython
