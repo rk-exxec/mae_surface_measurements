@@ -232,8 +232,8 @@ if HAS_VIMBA:
                     self._cam.Width.set(w_max)
                     self._cam.Height.set(h_max)
             self._image_size_invalid = True
+            self.snapshot()
             if was_running: self.start_streaming()
-            else: self.snapshot()
 
         def set_roi(self, x, y, w, h, nested=True):
             was_running = self._is_running
@@ -247,8 +247,8 @@ if HAS_VIMBA:
                         xo = x+xo
                         yo = y+yo
                         # limit width / height to stay within boundaries of new offset and current width/heigth
-                        w = min(w, cw - xo)
-                        h = min(h, ch - yo)
+                        w = min(w, cw - x)
+                        h = min(h, ch - y)
                     else:
                         xo = x
                         yo = y
@@ -285,12 +285,9 @@ if HAS_VIMBA:
                     self._cam.OffsetY.set(yo)
 
             self._image_size_invalid = True
-            if was_running: 
-                self.start_streaming()
-            else:
-                self.snapshot()
-
-        
+            self.snapshot()
+            if was_running: self.start_streaming()
+                
         def get_roi(self):
             with self._vimba:
                 with self._cam:
