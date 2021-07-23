@@ -396,6 +396,8 @@ class CameraPreview(QOpenGLWidget):
 
     def get_roi(self):
         """ return the ROI selected by the rubberband """
+        if self._roi_rubber_band.isHidden():
+            return None
         x,y = self._roi_rubber_band.mapToParent(QPoint(0,0)).toTuple()
         w,h = self._roi_rubber_band.size().toTuple()
         self.hide_rubberband()

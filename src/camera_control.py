@@ -218,7 +218,10 @@ class CameraControl(QGroupBox):
     @Slot()
     def apply_roi(self):
         """ Apply the ROI selected by the rubberband rectangle """
-        x,y,w,h = self.ui.camera_prev.get_roi() # new roi selection by rubberband
+        rubberband = self.ui.camera_prev.get_roi() # new roi selection by rubberband
+        if rubberband is None: return
+        else:
+            x,y,w,h = rubberband
         xc,yc,_,_ = self.cam.get_roi() # current roi
         xm,ym,wm,hm = self.ui.camera_prev.get_mask_dim() # current mask selection
         base_y = self.ui.camera_prev.get_baseline_y() # current baseline
