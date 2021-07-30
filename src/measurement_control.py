@@ -172,11 +172,12 @@ class MeasurementControl(QGroupBox):
         Stops the measurement gracefully, still writing the data.
         """
         logging.info("stopping measurement")
-        self.save_data_signal.emit()
-        if self.timer: self.timer.stop()
-        if self.thread: self.thread.terminate()
         self.aborted = False
         self.stopped = True
+        self.save_data_signal.emit()
+        if self.timer: self.timer.stop()
+        # if self.thread: self.thread.terminate()
+
         self.ui.startMeasBtn.setText("Start")
         self.ui.continueButton.setEnabled(False)
         self.ui.waitForUserLbl.setVisible(False)
@@ -187,10 +188,11 @@ class MeasurementControl(QGroupBox):
         stops the measurement without saving data
         """
         logging.info("aborting measurement")
-        if self.timer: self.timer.stop()
-        if self.thread: self.thread.terminate()
         self.aborted = True
         self.stopped = True
+        if self.timer: self.timer.stop()
+        # if self.thread: self.thread.terminate()
+
         self.ui.startMeasBtn.setText("Start")
         self.ui.continueButton.setEnabled(False)
         self.ui.waitForUserLbl.setVisible(False)
