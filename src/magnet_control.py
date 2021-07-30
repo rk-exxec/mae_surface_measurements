@@ -157,9 +157,9 @@ class MagnetControl(LinearStageControlGUI):
 
     def load_calib_file(self, file):
         """ load magnet to mm calibration file """
-        self._calibration_table = pd.read_csv(file)
-        self.mag_to_mm_interp = interp1d(self._calibration_table['Field_T'], self._calibration_table['Distance_m'])
-        self.mm_to_mag_interp = interp1d(self._calibration_table['Distance_m'], self._calibration_table['Field_T'])
+        self._calibration_table = pd.read_csv(file, sep="\t")
+        self.mag_to_mm_interp = interp1d(self._calibration_table['Field_T'], self._calibration_table['Dist_mm'])
+        self.mm_to_mag_interp = interp1d(self._calibration_table['Dist_mm'], self._calibration_table['Field_T'])
 
     def do_calibration(self):
         """ do a magnet vs mm calibration """
@@ -184,6 +184,7 @@ class MagnetControl(LinearStageControlGUI):
                 for i in np.arange(0, 35, .5):
                     
                     lt.move_absolute_mm(i)
+                    lt.wait_movement()
                     time.sleep(1)
                     mult = gaussmeter.query('FIELDM?').strip()
                     if len(mult) == 0:
@@ -197,7 +198,7 @@ class MagnetControl(LinearStageControlGUI):
                     #df.at[i,'Field(T)'] = tesla
                     #df.at[i,'Distance(m)'] = steps*(1.25e-3/1600)
                     #print('{0:d}\t{1:.3E} mm\t{2:.3E} T'.format(steps, self._lt_ctl.steps_to_mm(steps), tesla))
-                    f.write('{0:d}\t{1:.3E}\t{2:.3E}\n'.format(steps, lt.steps_to_mm(steps), tesla))
+                    f.write(f"{steps:d}\t{lt.steps_to_mm(steps):.3E}\t{tesla:.3E}\n")
         self.load_calib_file(path)
         self.unlock_mag_unit()
         #self._lt_ctl.move_absolute(0)
