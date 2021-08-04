@@ -176,6 +176,7 @@ class MeasurementControl(QGroupBox):
         self.stopped = True
         self.save_data_signal.emit()
         if self.timer: self.timer.stop()
+        self._wait_condition.wakeAll()
         # if self.thread: self.thread.terminate()
 
         self.ui.startMeasBtn.setText("Start")
@@ -191,6 +192,7 @@ class MeasurementControl(QGroupBox):
         self.aborted = True
         self.stopped = True
         if self.timer: self.timer.stop()
+        self._wait_condition.wakeAll()
         # if self.thread: self.thread.terminate()
 
         self.ui.startMeasBtn.setText("Start")
