@@ -141,8 +141,6 @@ class DataControl(QGroupBox):
             mag_step = str(self.ui.magnetControl.posSpinBox.value()) + '_' + self.ui.magnetControl.unitComboBox.currentText()
             self.ui.camera_ctl.save_image(str(path / f'img_mag_{mag_step}_cycle_{cycle}.png'))
             
-
-
     def export_data_csv(self, filename):
         """ Export data as csv with selected separator
 
@@ -156,6 +154,21 @@ class DataControl(QGroupBox):
             else:
                 QMessageBox.information(self, 'MAEsure Information', 'No data to be saved!', QMessageBox.Ok)
                 logging.warning('data_ctl: cannot convert empty dataframe to csv')
+
+    def export_data_excel(self, filename: str):
+        """ Export data as csv with selected separator
+
+        :param filename: name of file to create and write data to
+        """
+        sep = self._seps[self.ui.sepComb.currentIndex()]
+        filename = filename.replace(".csv",".xlsx")
+        with open(filename, 'wb') as f:
+            if self.data is not None:
+                self.data.to_excel(f, index=False)
+                logging.info(f'data_ctl: Saved data as {filename}')
+            else:
+                QMessageBox.information(self, 'MAEsure Information', 'No data to be saved!', QMessageBox.Ok)
+                logging.warning('data_ctl: cannot convert empty dataframe to xlsx')
 
     def select_filename(self):
         """ Opens `Save As...` dialog to determine file save location.
@@ -187,7 +200,13 @@ class DataControl(QGroupBox):
             path = path.with_stem(path.stem + '_1')
             self._cur_filename = str(path)
 
+        path_xls = Path(self._cur_filename.replace(".csv",".xlsx"))
+        if path_xls.is_file():
+            path_xls = path_xls.with_stem(path_xls.stem + '_1')
+
         path.touch(exist_ok=False)
+        path_xls.touch(exist_ok=False)
+
 
     def save_data(self):
         """ Saves all the stored data.
@@ -195,8 +214,9 @@ class DataControl(QGroupBox):
         Overwrites everything.
         """
         self.export_data_csv(self._cur_filename)
-        logging.info(f"saved data {self._cur_filename}")
-        self.ui.statusbar.showMessage(f"saved data {self._cur_filename}")
+        self.export_data_excel(self._cur_filename)
+        logging.info(f"saved data")
+        self.ui.statusbar.showMessage(f"saved data to {self._cur_filename}")
 
     def import_data_csv(self, filename):
         """ Import data and display it.
