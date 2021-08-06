@@ -335,6 +335,8 @@ if HAS_VIMBA:
                 with self._cam:
                     self._cam.ExposureTime.set(1000.0)
                     self._cam.ReverseY.set(True)
+                    self._cam.AcquisitionFrameRateEnable.set(True)
+                    self._cam.AcquisitionFrameRate.set(30.0)
 
         def get_framerate(self):
             try:
