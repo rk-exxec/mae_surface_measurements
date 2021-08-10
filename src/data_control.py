@@ -59,7 +59,7 @@ class DataControl(QGroupBox):
             - **DateTime**: date and time at begin of measurement
         
         """
-        self.header = ['Time', 'Repetition', 'Left_Angle', 'Right_Angle', 'Base_Width', 'Substate_Surface_Energy', 'Magn_Pos', 'Magn_Unit', 'Fe_Vol_P', 'ID', 'DateTime']
+        self.header = ['Time', 'Repetition', 'Left_Angle', 'Right_Angle', 'Base_Width', 'Drplt_Vol', 'Magn_Pos', 'Magn_Field', 'Fe_Vol_P', 'ID', 'DateTime']
         self.data = pd.DataFrame(columns=self.header)
 
         self._is_time_invalid = False
@@ -104,27 +104,34 @@ class DataControl(QGroupBox):
         :param cycle: current cycle in case of repeated measurements
         """
         if self._is_time_invalid: self.init_time()
-        id = self.ui.idCombo.currentText() if self.ui.idCombo.currentText() != "" else "-"
-        percent = self.ui.ironContentEdit.text()
+        material_id = self.ui.idCombo.currentText() if self.ui.idCombo.currentText() != "" else "-"
+        iron_content = self.ui.ironContentEdit.text()
         curtime = time.monotonic() - self._time
+        mag_pos = self.ui.magnetControl.posSpinBox.value()
+        mag_field = self.ui.magnetControl.mm_to_mag_interp(mag_pos)
+        if droplet.scale_px_to_mm is not None:
+            base_dia = droplet.base_diam_mm
+            drplt_vol = droplet.volume_mm * 1e-6
+        else:
+            base_dia = droplet.base_diam
+            drplt_vol = droplet.volume
+
         self.data = self.data.append(
             pd.DataFrame([[
                 curtime, 
                 cycle, 
                 droplet.angle_l, 
                 droplet.angle_r, 
-                droplet.base_diam, 
-                "-", 
-                self.ui.magnetControl.posSpinBox.value(),
-                self.ui.magnetControl.unitComboBox.currentText(),
-                percent, 
-                id, 
+                base_dia, 
+                drplt_vol, 
+                mag_pos,
+                mag_field,
+                iron_content, 
+                material_id, 
                 self._meas_start_datetime
             ]], columns=self.header)
         )
-        #logging.debug("starte thread zum redrawing vom table")
-        # self.thr = Worker(self.ui.tableControl.redraw_table)
-        # self.thr.start()
+
         self.ui.tableControl.redraw_table_signal.emit()
         self.update_plot_signal.emit(curtime,(droplet.angle_l + droplet.angle_r)/2)
 

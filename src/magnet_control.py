@@ -55,8 +55,9 @@ class MagnetControl(LinearStageControlGUI):
         super().__init__(parent=parent)
         self.ui : Ui_main = None
         self._calibration_table: pd.DataFrame = None
-        self.mag_to_mm_interp: interpolate.interp1d = None
-        self.mm_to_mag_interp: interpolate.interp1d = None
+        self.mag_to_mm_interp: interpolate.interp1d = lambda x: -1.0
+        self.mm_to_mag_interp: interpolate.interp1d = lambda x: -1.0
+        self._max_pos = -1
         logging.debug("initialized magnet control")
 
     def showEvent(self, event: QShowEvent):
