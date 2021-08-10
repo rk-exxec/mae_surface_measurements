@@ -84,7 +84,7 @@ class DataControl(QGroupBox):
                 self.ui.fileNameEdit.setText(os.path.expanduser(f'G:/Messungen/Angle_Measurements/{self._initial_filename}.csv'))
                 self._default_dir = 'G:/Messungen/Angle_Measurements'
             else:
-                self.ui.fileNameEdit.setText(os.path.expanduser(f'~/Documents/{self._initial_filename}.csv'))
+                self.ui.fileNameEdit.setText(os.path.expanduser(f'~/Documents/MAEsure/{self._initial_filename}.csv'))
                 self._default_dir = '~/Documents'
             self.connect_signals()
             self._first_show = False
