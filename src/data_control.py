@@ -108,7 +108,7 @@ class DataControl(QGroupBox):
         iron_content = self.ui.ironContentEdit.text()
         curtime = time.monotonic() - self._time
         mag_pos = self.ui.magnetControl.posSpinBox.value()
-        mag_field = self.ui.magnetControl.mm_to_mag_interp(mag_pos)
+        mag_field = float(self.ui.magnetControl.mm_to_mag_interp(mag_pos))
         if droplet.scale_px_to_mm is not None:
             base_dia = droplet.base_diam_mm
             drplt_vol = droplet.volume_mm * 1e-6
