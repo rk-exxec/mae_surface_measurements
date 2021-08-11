@@ -93,7 +93,7 @@ class MagnetControl(LinearStageControlGUI):
             elif self._old_unit == 'mT':
                 self.posSpinBox.setValue(self.ls_ctl.mm_to_steps(self.mag_to_mm_interp(self.posSpinBox.value()/1000)))
         elif unit == 'mT':
-            self.posSlider.setMaximum(max(self._calibration_table['Field(T)'])*1000)
+            self.posSlider.setMaximum(max(self._calibration_table['Field_T'])*1000)
             self.posSlider.setTickInterval(10)
             self.posSpinBox.setDecimals(0)
             if self._old_unit == 'mm':
