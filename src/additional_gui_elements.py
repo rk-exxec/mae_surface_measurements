@@ -21,7 +21,7 @@ from camera import AbstractCamera
 
 from PySide2 import QtWidgets
 from PySide2.QtCore import QCoreApplication, QObject, QRect, QSize, Slot, QTimer
-from PySide2.QtGui import Qt
+from PySide2.QtGui import QFont, Qt
 from PySide2.QtWidgets import QDialog, QDoubleSpinBox, QFrame, QHBoxLayout, QLabel, QLineEdit, QPlainTextEdit, QPushButton, QSizePolicy, QSlider, QSpinBox, QVBoxLayout, QWidget
 
 
@@ -70,6 +70,43 @@ class AboutDialog(QDialog):
 "\n"
 "You should have received a copy of the GNU General Public License\n"
 "along with this program.  If not, see <https://www.gnu.org/licenses/>.", None))
+        self.licenseText.setPlaceholderText("")
+        self.okButton.setText(QCoreApplication.translate("about", u"OK", None))
+    # retranslateUi
+
+class CamInfoDialog(QDialog):
+    def __init__(self, parent, cam):
+        super(CamInfoDialog, self).__init__(parent=parent)
+        self.cam = cam
+        self.setupUI()
+        
+        # Add button signal to greetings slot
+        self.okButton.clicked.connect(self.hide)
+
+        self.show()
+
+
+    def setupUI(self):
+        self.resize(431, 260)
+        self.licenseText = QPlainTextEdit(self)
+        self.licenseText.setObjectName(u"camInfo")
+        self.licenseText.setEnabled(True)
+        self.licenseText.setGeometry(QRect(10, 10, 411, 211))
+        self.licenseText.setFrameShape(QFrame.StyledPanel)
+        self.licenseText.setFrameShadow(QFrame.Sunken)
+        self.licenseText.setUndoRedoEnabled(False)
+        self.licenseText.setTextInteractionFlags(Qt.NoTextInteraction)
+        self.licenseText.setFont(QFont("Courier New"))
+        self.okButton = QPushButton(self)
+        self.okButton.setObjectName(u"okButton")
+        self.okButton.setGeometry(QRect(350, 230, 75, 23))
+
+        self.retranslateUi()
+    # setupUi
+
+    def retranslateUi(self):
+        self.setWindowTitle(QCoreApplication.translate("about", u"Camera Info", None))
+        self.licenseText.setPlainText(QCoreApplication.translate("about", str(self.cam)))
         self.licenseText.setPlaceholderText("")
         self.okButton.setText(QCoreApplication.translate("about", u"OK", None))
     # retranslateUi

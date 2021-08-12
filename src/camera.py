@@ -99,6 +99,9 @@ class AbstractCamera(QObject):
         self._is_running = False
         self._image_size_invalid = True
 
+    def __str__(self):
+        return "Abstract Camera Interface"
+
     @property
     def is_running(self):
         """ 
@@ -147,6 +150,9 @@ class AbstractCamera(QObject):
         """ return current FPS of camera"""
         pass #raise NotImplementedError
 
+    def set_framerate(self, fps):
+        raise NotImplementedError
+
     def get_resolution(self) -> Tuple[int,int]:
         """ return resolution of current camera capture (width, height) """
         raise NotImplementedError
@@ -187,7 +193,11 @@ if HAS_VIMBA:
             self.stop_streaming()
             del self._cam
             del self._vimba
-        
+
+        def __str__(self):
+            info = self.get_cam_info()
+            return '\n'.join([f"{feat._info.displayName.decode('utf-8'):30}: {feat.get()}" for feat in info])
+
         def _prime_vimba(self):
             # prime vimba interface, so it doesnt shut down
             # speeds up all camera actions
@@ -335,8 +345,22 @@ if HAS_VIMBA:
                 with self._cam:
                     self._cam.ExposureTime.set(1000.0)
                     self._cam.ReverseY.set(True)
+                    self.set_framerate(30.0)
+
+        def set_framerate(self, fps=30.0):
+            with self._vimba:
+                with self._cam:
+                    if self.is_running:
+                        was_running = True
+                        self.stop_streaming()
+                    else:
+                        was_running = False
+                    range = self._cam.AcquisitionFrameRate.get_range()
                     self._cam.AcquisitionFrameRateEnable.set(True)
-                    self._cam.AcquisitionFrameRate.set(30.0)
+                    self._cam.AcquisitionFrameRate.set(min(max(fps,range[0]),range[1]))
+
+                    if was_running:
+                        self.start_streaming()
 
         def get_framerate(self):
             try:
@@ -363,6 +387,9 @@ if HAS_VIMBA:
             with self._vimba:
                 with self._cam:
                     self._cam.ExposureTime.set(exposure)
+                    # ensure maximum framerate for exposure capped at 30
+                    if 1e6/exposure > self.get_framerate():
+                        self.set_framerate(min(1e6/exposure, 30.0))
 
         def get_exposure_range(self):
             with self._vimba:
@@ -384,6 +411,13 @@ if HAS_VIMBA:
                 with self._cam:
                     self._cam.ExposureAuto.set(mode)
 
+        def get_cam_info(self):
+            with self._vimba, self._cam as cam:
+                dev_ctl = cam.get_features_by_category("/DeviceControl")
+                # remove irrelevant data and sort for groups
+                info_idx = [26,0,14,20,3,25,11,10,23]
+                info = [dev_ctl[i] for i in info_idx]
+            return info
 
 class TestCamera(AbstractCamera):
     def __init__(self):

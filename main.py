@@ -33,7 +33,7 @@ from PySide2.QtCore import QCoreApplication, QSettings, Qt
 
 from camera_control import CameraControl
 from data_control import DataControl
-from additional_gui_elements import AboutDialog
+from additional_gui_elements import AboutDialog, CamInfoDialog
 from droplet import Droplet
 
 class MainWindow(QMainWindow):
@@ -70,6 +70,9 @@ class MainWindow(QMainWindow):
         self.ui.actionBaseline.triggered.connect(self.ui.camera_prev._baseline.delete_y_level)
         self.ui.actionSample_IDs.triggered.connect(self.ui.idCombo.delete_entries)
         self.ui.actionCamera_scale_factor.triggered.connect(Droplet.delete_scale)
+        # info menu 
+        self.ui.actionCamera_Info.triggered.connect(lambda: CamInfoDialog(self.window(), self.ui.camera_ctl.cam))
+        self.ui.actionAbout_MAEsure.triggered.connect(lambda : AboutDialog(self.window()))
         # shortcuts
         QShortcut(QtGui.QKeySequence("F9"), self, self.ui.camera_ctl.set_bright)
         QShortcut(QtGui.QKeySequence("F10"), self, self.ui.camera_ctl.set_dark)
@@ -154,8 +157,6 @@ if __name__ == "__main__":
     # init application
     app = App(sys.argv)
     app.processEvents()
-
-    app.ui.actionAbout_MAEsure.triggered.connect(lambda : AboutDialog(app.window))
 
     # execute qt main loop
     sys.exit(app.exec_())
