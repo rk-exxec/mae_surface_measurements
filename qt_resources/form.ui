@@ -1268,6 +1268,7 @@ every cycle</string>
      <string>Help</string>
     </property>
     <addaction name="actionAbout_MAEsure"/>
+    <addaction name="actionCamera_Info"/>
    </widget>
    <addaction name="menuMenu"/>
    <addaction name="menuHelp"/>
@@ -1352,6 +1353,11 @@ every cycle</string>
   <action name="actionCamera_scale_factor">
    <property name="text">
     <string>Camera scale factor</string>
+   </property>
+  </action>
+  <action name="actionCamera_Info">
+   <property name="text">
+    <string>Camera Info</string>
    </property>
   </action>
  </widget>
