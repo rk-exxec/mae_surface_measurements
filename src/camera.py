@@ -20,6 +20,7 @@ import cv2
 import pydevd
 from PySide2.QtCore import QObject, QTimer, Signal, Slot
 import numpy as np
+from vimba.frame import PixelFormat
 
 try:
     from vimba import Vimba, Frame, Camera, LOG_CONFIG_TRACE_FILE_ONLY
@@ -216,7 +217,7 @@ if HAS_VIMBA:
             with self._vimba:
                 with self._cam:
                     frame: Frame = self._cam.get_frame()
-                    self.new_image_available.emit(frame.as_opencv_image())
+                    self.new_image_available.emit(frame.as_numpy_ndarray())
 
         def stop_streaming(self):
             if self._is_running:
@@ -320,7 +321,8 @@ if HAS_VIMBA:
             #pydevd.settrace(suspend=False)
             self._frc.add_new_timesstamp(frame.get_timestamp())
             if frame.get_status() != FrameStatus.Incomplete:
-                img = frame.as_opencv_image()
+                #img = frame.as_opencv_image()
+                img = frame.as_numpy_ndarray()
                 self.new_image_available.emit(img)
             cam.queue_frame(frame)
 
@@ -343,6 +345,8 @@ if HAS_VIMBA:
             #self.reset_camera()
             with self._vimba:
                 with self._cam:
+                    self._cam.set_pixel_format(PixelFormat.Mono8)
+                    self._cam.DeviceLinkThroughputLimit.set(300000000)
                     self._cam.ExposureTime.set(1000.0)
                     self._cam.ReverseY.set(True)
                     self.set_framerate(30.0)
@@ -370,6 +374,11 @@ if HAS_VIMBA:
                         #return round(self._frc.average_fps,1)
             except VimbaCameraError as ex:
                 return -1
+
+        def get_pixel_size(self):
+            with self._vimba, self._cam:
+                px_size = self._cam.PixelSize.get().as_tuple()[1]
+                return px_size
 
         def get_resolution(self) -> Tuple[int, int]:
             with self._vimba:

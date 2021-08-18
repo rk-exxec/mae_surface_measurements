@@ -80,6 +80,7 @@ class CameraControl(QGroupBox):
         self.update()
         self._oneshot_eval = False
         self._frametime = RollingAverager(100)
+        self.cv2_clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
         logging.debug("initialized camera control")
 
     def __del__(self):
@@ -286,7 +287,8 @@ class CameraControl(QGroupBox):
         """
         # block image signal to prevent overloading
         #blocker = QSignalBlocker(self.cam)
-        
+        dt = time.time()
+        cv_img = self.ensure_8bit_image(cv_img)
         if self.cam.is_running:
             # evaluate droplet if checkbox checked
             eval = self.ui.evalChk.isChecked() or self._oneshot_eval
@@ -315,7 +317,6 @@ class CameraControl(QGroupBox):
             self.ui.camera_prev.invalidate_imagesize()
             self.cam._image_size_invalid = False
 
-        dt = time.time()
         # update preview image    
         self.ui.camera_prev.update_image(cv_img, eval)
         self.frametime = (time.time() - dt) * 1000
@@ -326,6 +327,19 @@ class CameraControl(QGroupBox):
 
         # unblock signals from cam
         #blocker.unblock()
+
+    def ensure_8bit_image(self, img: np.ndarray):
+        """ checks bit count of inut and normalizes to 8 bit if nessecary, also tries to do contrast enhancement """
+        if self.cam.get_pixel_size() > 8:
+            ret = np.zeros(img.shape, dtype=np.uint8)
+            self.cv2_clahe.apply(img)
+            cv2.normalize(img, ret, norm_type=cv2.NORM_MINMAX, alpha=0, beta=255, dtype=cv2.CV_8U)
+            return ret
+        else:
+            # ret = cv2.equalizeHist(img)
+            # ret = np.reshape(ret, img.shape)
+            # return ret
+            return img
 
     @Slot()
     def update_cam_info(self):
