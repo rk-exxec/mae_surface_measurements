@@ -65,7 +65,7 @@ class DataControl(QGroupBox):
         self._is_time_invalid = False
         self._first_show = True
         self._default_dir = '%USERDATA%'
-        self._initial_filename = '!now!_!ID!_!pos!'
+        self._initial_filename = '!now!_!ID!'
         self._meas_start_datetime = ''
         self._cur_filename = ''
         self._seps = ['\t',',']
@@ -169,9 +169,11 @@ class DataControl(QGroupBox):
         """
         sep = self._seps[self.ui.sepComb.currentIndex()]
         filename = filename.replace(".csv",".xlsx")
-        with open(filename, 'wb') as f:
+        with pd.ExcelWriter(filename) as f:
+        # with open(filename, 'wb') as f:
             if self.data is not None:
-                self.data.to_excel(f, index=False)
+                self.data.to_excel(f, index=False, sheet_name="RawData")
+                calc_mean_and_error(self.data).to_excel(f, index=False, sheet_name="MeanAndError")
                 logging.info(f'data_ctl: Saved data as {filename}')
             else:
                 QMessageBox.information(self, 'MAEsure Information', 'No data to be saved!', QMessageBox.Ok)
@@ -252,3 +254,16 @@ class DataControl(QGroupBox):
         self.data = pd.DataFrame(columns=self.header)
         self.create_file()
         self._is_time_invalid = True
+
+def calc_mean_and_error(data: pd.DataFrame) -> pd.DataFrame:
+    grouped_df = data[['Left_Angle', 'Right_Angle', 'Base_Width', 'Drplt_Vol', 'Magn_Pos', 'Magn_Field']].groupby('Magn_Pos',sort=False)
+    mean_df = grouped_df.mean()
+    mean_df[['Left_Angle_SEM_68','Right_Angle_SEM_68']] = grouped_df[['Left_Angle','Right_Angle']].sem()
+    mean_df[['Left_Angle_SEM_95','Right_Angle_SEM_95']] = mean_df[['Left_Angle_SEM_68','Right_Angle_SEM_68']] * 2
+    mean_df = mean_df.reset_index()
+    return mean_df
+
+if __name__ == "__main__":
+    data = pd.read_csv("G:/Messungen/Angle_Measurements/21_08_17_13-42_030821-g-pl_39.0.csv",sep="\t",header=0)
+    meanandsuch = calc_mean_and_error(data)
+    meanandsuch.to_csv("G:/Messungen/Angle_Measurements/test123.csv",sep="\t", index=False)
