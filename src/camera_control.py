@@ -80,7 +80,7 @@ class CameraControl(QGroupBox):
         self.update()
         self._oneshot_eval = False
         self._frametime = RollingAverager(100)
-        self.cv2_clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+        self.cv2_clahe = cv2.createCLAHE(clipLimit=1, tileGridSize=(2,2))
         logging.debug("initialized camera control")
 
     def __del__(self):
@@ -329,11 +329,13 @@ class CameraControl(QGroupBox):
         #blocker.unblock()
 
     def ensure_8bit_image(self, img: np.ndarray):
-        """ checks bit count of inut and normalizes to 8 bit if nessecary, also tries to do contrast enhancement """
+        """ checks bit count of inut and normalizes to 8 bit if nessecary, also tries to do contrast enhancement from additional info """
         if self.cam.get_pixel_size() > 8:
             ret = np.zeros(img.shape, dtype=np.uint8)
-            self.cv2_clahe.apply(img)
+            #img = self.cv2_clahe.apply(img)
             cv2.normalize(img, ret, norm_type=cv2.NORM_MINMAX, alpha=0, beta=255, dtype=cv2.CV_8U)
+            # ret = cv2.convertScaleAbs(img)
+            # ret = np.reshape(ret, img.shape)
             return ret
         else:
             # ret = cv2.equalizeHist(img)
