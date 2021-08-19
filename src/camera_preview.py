@@ -417,3 +417,8 @@ class CameraPreview(QOpenGLWidget):
         invalidate image size, causes image size to be reevaluated on next camera image
         """
         self._image_size_invalid = True
+
+    def invalidate_droplet(self):
+        """invalidates droplet and thus hiding any overlay
+        """
+        self._droplet.is_valid = False

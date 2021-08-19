@@ -74,11 +74,15 @@ class MainWindow(QMainWindow):
         self.ui.actionCamera_Info.triggered.connect(lambda: CamInfoDialog(self.window(), self.ui.camera_ctl.cam))
         self.ui.actionAbout_MAEsure.triggered.connect(lambda : AboutDialog(self.window()))
         # shortcuts
+        QShortcut(QtGui.QKeySequence("F5"), self, lambda: self.ui.measurementControl.continue_measurement())
+        QShortcut(QtGui.QKeySequence("F6"), self, lambda: self.ui.pump_control.infuse())
         QShortcut(QtGui.QKeySequence("F9"), self, self.ui.camera_ctl.set_bright)
         QShortcut(QtGui.QKeySequence("F10"), self, self.ui.camera_ctl.set_dark)
+        QShortcut(QtGui.QKeySequence("F12"), self, self.ui.camera_ctl.save_image_dialog)
+
         QShortcut(QtGui.QKeySequence("PgUp"), self, self.ui.camera_ctl.increase_exposure)
         QShortcut(QtGui.QKeySequence("PgDown"), self, self.ui.camera_ctl.decrease_exposure)
-        QShortcut(QtGui.QKeySequence("F12"), self, self.ui.camera_ctl.save_image_dialog)
+
         QShortcut(QtGui.QKeySequence("left"), self, lambda: self.ui.camera_ctl.shift_roi("left"))
         QShortcut(QtGui.QKeySequence("Shift+left"), self, lambda: self.ui.camera_ctl.shift_roi("left",True))
         QShortcut(QtGui.QKeySequence("right"), self, lambda: self.ui.camera_ctl.shift_roi("right"))
@@ -87,6 +91,9 @@ class MainWindow(QMainWindow):
         QShortcut(QtGui.QKeySequence("Shift+up"), self, lambda: self.ui.camera_ctl.shift_roi("up",True))
         QShortcut(QtGui.QKeySequence("down"), self, lambda: self.ui.camera_ctl.shift_roi("down"))
         QShortcut(QtGui.QKeySequence("Shift+down"), self, lambda: self.ui.camera_ctl.shift_roi("down",True))
+
+        QShortcut(QtGui.QKeySequence("Backspace"), self, lambda: self.ui.camera_prev.invalidate_droplet())
+        
 
     def cleanup(self):
         del self
