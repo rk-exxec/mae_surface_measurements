@@ -52,8 +52,8 @@ class DataControl(QGroupBox):
             - **Right_Angle**: angle of right droplet side
             - **Base_Width**: Width of the droplet
             - **Substrate_Surface_Energy**: calculated surface energy of substrate from angles
-            - **Magn_Pos**: position of magnet
-            - **Magn_Unit**: unit of magnet pos (mm or steps or Tesla)
+            - **Magn_Pos**: position of magnet in mm
+            - **Magn_Field**: magnet field in Tesla if calib file present
             - **Fe_Vol_P**: iron content in sample in Vol.% 
             - **ID**: ID of sample
             - **DateTime**: date and time at begin of measurement
