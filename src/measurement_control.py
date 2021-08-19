@@ -132,25 +132,28 @@ class MeasurementControl(QGroupBox):
         checks if measurement is not already running and camera is functional. 
         If conditions met will start measurement thread
         """
-        logging.info("startng measurement")
+        logging.info("Meas_Ctl: Starting measurement")
+        # save id field if not already done
+        self.ui.idCombo.save_dropdown_entry()
+
         if not self.ui.camera_ctl.is_streaming():
             QMessageBox.information(self, 'MAEsure Information',' Camera is not running!\nPlease start camera first!', QMessageBox.Ok)
-            logging.info('Meas_Start: Camera not running')
+            logging.info('Meas_Ctl: Camera not running')
             return
         if not self.stopped:
             QMessageBox.information(self, 'MAEsure Information',' Cannot start measurement while already running!', QMessageBox.Ok)
-            logging.info('Meas_Start: Measurement already running')
+            logging.info('Meas_Ctl: Measurement already running')
             return
         if self.ui.magnetControl.needs_reference():
             QMessageBox.information(self, 'MAEsure Information',' Cannot start measurement without referencing motor!', QMessageBox.Ok)
-            logging.info('Meas_Start: Motor not referenced!')
+            logging.info('Meas_Ctl: Motor not referenced!')
             return
         try:
             self.read_intervals()
             self.ui.dataControl.init_data()
         except Exception as ex:
             QMessageBox.warning(self, 'MAEsure Error', f'An error occured:\n{str(ex)}', QMessageBox.Ok)
-            logging.exception("measurement control: error", exc_info=ex)
+            logging.exception("Meas_Ctl: error", exc_info=ex)
             return
 
         # prepare live plot for new data
@@ -171,7 +174,7 @@ class MeasurementControl(QGroupBox):
         """
         Stops the measurement gracefully, still writing the data.
         """
-        logging.info("stopping measurement")
+        logging.info("Meas_Ctl: stopping measurement")
         self.aborted = False
         self.stopped = True
         self.save_data_signal.emit()
@@ -188,7 +191,7 @@ class MeasurementControl(QGroupBox):
         """
         stops the measurement without saving data
         """
-        logging.info("aborting measurement")
+        logging.info("Meas_Ctl: aborting measurement")
         self.aborted = True
         self.stopped = True
         if self.timer: self.timer.stop()

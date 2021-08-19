@@ -49,7 +49,7 @@ class IdComboBox(QComboBox):
         return super().showEvent(event)
 
     def connect_signals(self):
-        self.lineEdit().returnPressed.connect(self.dropdown_text_changed)
+        self.lineEdit().returnPressed.connect(self.save_dropdown_entry)
         self.currentIndexChanged.connect(self.update_iron_precentage)
         self.customContextMenuRequested.connect(self.showMenu)
         self.ui.ironContentEdit.returnPressed.connect(self.ui.idCombo.update_id_iron)
@@ -59,13 +59,13 @@ class IdComboBox(QComboBox):
         clear_action = menu.addAction("Clear all", self.clear())
         action = menu.exec_(self.mapToGlobal(pos))
 
-    def dropdown_text_changed(self):
+    def save_dropdown_entry(self):
         """dropdown edit text edited
         """
         self.add_dropdown_entry(self.currentText())
 
     def add_dropdown_entry(self, entry):
-        if not entry in self._ids.keys():
+        if entry != "" and not entry in self._ids.keys():
             #self.addItem(entry)
             self._ids[entry] = self.ui.ironContentEdit.text()
 
