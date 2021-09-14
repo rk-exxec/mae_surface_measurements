@@ -176,6 +176,14 @@ class CameraPreview(QOpenGLWidget):
             self._abort_roi()
             self.update()
 
+    def resizeEvent(self, e: QtGui.QResizeEvent) -> None:
+        evt_ret = super().resizeEvent(e)
+        self.invalidate_imagesize()
+        if self._raw_image is not None: self.update_image(self._raw_image, False)
+        self._baseline.rescalePos(self.height()/e.oldSize().height())
+        self._baseline.resize(self.width(),0)
+        return evt_ret
+
     @Slot(np.ndarray, bool)
     def update_image(self, cv_img: np.ndarray, eval: bool = True):
         """ 
@@ -211,6 +219,7 @@ class CameraPreview(QOpenGLWidget):
                 self._image_size = np.shape(cv_img)
                 self.set_new_baseline_constraints()
                 self._image_size_invalid = False
+
             self.update()
             # del cv_img
         except Exception as ex:

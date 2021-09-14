@@ -144,6 +144,12 @@ class Baseline(QWidget):
             self.load_y_level()
             self._first_show = False
 
+    def resize(self, w: int, h: int) -> None:
+        return super().resize(w, self.height())
+
+    def rescalePos(self, scale_factor):
+        self.y_level = self.y_level*scale_factor
+
     def mousePressEvent(self, event):
         """
         mouse button pressed handler
