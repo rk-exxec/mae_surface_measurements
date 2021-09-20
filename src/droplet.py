@@ -72,12 +72,8 @@ class Droplet(Singleton):
         self._angle_r       : float                 = 0.0
         self._angle_r_avg                           = RollingAverager()
         self.center         : tuple[int,int]        = (0,0)
-        self.maj            : int                   = 0
-        self.min            : int                   = 0
-        self.phi            : float                 = 0.0
-        self.tilt_deg       : float                 = 0.0
-        self.foc_pt1        : tuple[int,int]        = (0,0)
-        self.foc_pt2        : tuple[int,int]        = (0,0)
+        self.ellipse                                = None
+        self.divider        : int                   = 0
         self.tan_l_m        : int                   = 0
         self.int_l          : tuple[int,int]        = (0,0)
         self.line_l         : tuple[int,int,int,int] = (0,0,0,0)
